@@ -1,0 +1,86 @@
+@model NoticeBoard.Models.Notification
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Notification</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OwnerID)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OwnerID)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+    </dl>
+</div>
+<div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        @if ((await AuthorizationService.AuthorizeAsync(
+            User, Model,
+            NotificatinOperations.Update)).Succeeded)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.NotificationId">Edit</a> 
+        }
+        
+    }
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@{
+    if(Model.Comments!=null)
+    {
+        @foreach(var comment in Model.Comments)
+        {
+        <tr>
+            <td>
+                <p>@comment.CommentId</p>
+            </td>
+            <td>
+                <p>@comment.OwnerID</p>
+            </td>
+            <td>
+                <p>@comment.Description</p>
+            </td>
+            <td>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @*TODO:add controller for comments*@
+                    <a asp-controller="" asp-action="" asp-route-id="@comment.CommentId">Edit</a><span>|</span>
+                    <a asp-controller="" asp-action="" asp-route-id="@comment.CommentId">Delete</a>                   
+                }
+
+            </td>
+        </tr>
+        }
+    }
+}
+
+@*Post comment without page reloading*@
+
+@*TODO:add methods to post comments*@
+<form asp-action="PostComment">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="OwnerID" class="text-danger"></span>
+    </div>
+</form>

@@ -12,6 +12,9 @@ using NoticeBoard.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+    using Microsoft.AspNetCore.Mvc.Authorization;
+    using Microsoft.AspNetCore.Authorization;
+    using NoticeBoard.Authorization;
 
 namespace NoticeBoard
 {
@@ -24,16 +27,29 @@ namespace NoticeBoard
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<NoticeBoardDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("NoticeBoardDb")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()//added roles
                 .AddEntityFrameworkStores<NoticeBoardDbContext>();
             services.AddControllersWithViews();
            services.AddRazorPages();
+
+
+
+            services.AddControllers(config =>//add require authenticated user use [AllowAnonymous] for controller actions
+            {
+                // using Microsoft.AspNetCore.Mvc.Authorization;
+                // using Microsoft.AspNetCore.Authorization;
+                var policy = new AuthorizationPolicyBuilder()
+                                .RequireAuthenticatedUser()
+                                .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
+
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -67,7 +83,13 @@ namespace NoticeBoard
                 options.SlidingExpiration = true;
             });
 
+                        // Authorization handlers.
+            services.AddScoped<IAuthorizationHandler,
+                                NoticetIsOwnerAuthorizationHandler>();//services that uses entity framework core must be registred
+                                //usign AddScoped
 
+            services.AddSingleton<IAuthorizationHandler,
+                                NoticeAdministratorAuthorizationHandler>();
 
 
         }
