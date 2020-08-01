@@ -11,12 +11,6 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OwnerID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OwnerID)
-        </dd>
-        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd class = "col-sm-10">
@@ -50,9 +44,6 @@
         @foreach(var comment in Model.Comments)
         {
         <tr>
-            <td>
-                <p>@comment.CommentId</p>
-            </td>
             <td>
                 <p>@comment.OwnerID</p>
             </td>

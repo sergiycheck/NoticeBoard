@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.AspNetCore.Authorization;
     using NoticeBoard.Authorization;
+using NoticeBoard.Helpers;
 
 namespace NoticeBoard
 {
@@ -86,7 +87,10 @@ namespace NoticeBoard
                         // Authorization handlers.
             services.AddScoped<IAuthorizationHandler,
                                 NoticetIsOwnerAuthorizationHandler>();//services that uses entity framework core must be registred
-                                //usign AddScoped
+                                                                      //usign AddScoped
+
+            //TODO:try to implement customAuthorizationSerivce for better testing (descriptor error)
+            //services.AddSingleton<ICustomAuthorizationService, CustomAuthorizationService>();
 
             services.AddSingleton<IAuthorizationHandler,
                                 NoticeAdministratorAuthorizationHandler>();

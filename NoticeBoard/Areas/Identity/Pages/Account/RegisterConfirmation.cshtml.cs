@@ -41,7 +41,7 @@ namespace NoticeBoard.Areas.Identity.Pages.Account
             }
 
             Email = email;
-            // Once you add a real email sender, you should remove this code that lets you confirm the account
+
             //TODO: add email sender and confirmation https://app.sendgrid.com/
             DisplayConfirmAccountLink = true;//set to true if you want to display page for registerconfirmation
             if (DisplayConfirmAccountLink)

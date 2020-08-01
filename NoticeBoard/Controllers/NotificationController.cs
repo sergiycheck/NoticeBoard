@@ -65,11 +65,10 @@ namespace NoticeBoard.Controllers
         }
 
         // POST: Notification/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OwnerID,Name,Description")] Notification notification)
+        public async Task<IActionResult> Create([Bind("Name,Description")] Notification notification)
         {
             if (ModelState.IsValid)
             {
@@ -123,11 +122,10 @@ namespace NoticeBoard.Controllers
         }
 
         // POST: Notification/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NotificationId,OwnerID,Name,Description")] Notification notification)
+        public async Task<IActionResult> Edit(int id, [Bind("NotificationId,Name,Description")] Notification notification)
         {
             if (id != notification.NotificationId)
             {
