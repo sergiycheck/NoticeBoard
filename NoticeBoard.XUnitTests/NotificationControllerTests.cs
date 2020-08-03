@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using NoticeBoard.Authorization;
+using Microsoft.Extensions.Logging;
 
 
 //in directory NoticeBoard.XUnitTest execute following command to add reference to testing project
@@ -52,7 +53,10 @@ namespace NoticeBoard.XUnitTests
                             mockUser.Object,
                             context.Notifications.AsNoTracking().FirstOrDefault(),
                             NotificatinOperations.Update)).ReturnsAsync(AuthorizationResult.Success());
-                    var controller = new NotificationController(context, mockAuthorizationService.Object,It.IsAny<UserManager<IdentityUser>>());
+                    var controller = new NotificationController(context, 
+                    mockAuthorizationService.Object,
+                    It.IsAny<UserManager<IdentityUser>>(),
+                    It.IsAny<ILogger<DI_BaseController>>());
 
                     //Act
                     var result = await controller.Index();

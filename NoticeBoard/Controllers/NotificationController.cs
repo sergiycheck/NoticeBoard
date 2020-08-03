@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using NoticeBoard.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.Extensions.Logging;
+
+
 namespace NoticeBoard.Controllers
 {
     public class NotificationController : DI_BaseController
@@ -19,7 +22,7 @@ namespace NoticeBoard.Controllers
 
         public NotificationController(NoticeBoardDbContext context,
             IAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager):base(context,authorizationService,userManager)
+            UserManager<IdentityUser> userManager,ILogger<DI_BaseController> logger):base(context,authorizationService,userManager,logger)
         {    
         }
 
@@ -27,6 +30,7 @@ namespace NoticeBoard.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("method: Get. Notification controller index");
             return View(await _context.Notifications.AsNoTracking().ToListAsync());
         }
 

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using NoticeBoard.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace NoticeBoard.Controllers
 {
@@ -20,7 +21,7 @@ namespace NoticeBoard.Controllers
 
         public CommentController(NoticeBoardDbContext context,
             IAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager):base(context,authorizationService,userManager)
+            UserManager<IdentityUser> userManager,ILogger<DI_BaseController> logger):base(context,authorizationService,userManager,logger)
         {    
         }
 
@@ -58,6 +59,12 @@ namespace NoticeBoard.Controllers
                 return NotFound();
             }
 
+            var isAuthorized = User.IsInRole(NotificationConstants.ContactAdministratorsRole);
+            if(!isAuthorized)
+            {
+                return Forbid();
+            }
+
             var comment = await _context.Comments
                 .Include(c => c.Notification)
                 .FirstOrDefaultAsync(m => m.CommentId == id);
@@ -77,22 +84,21 @@ namespace NoticeBoard.Controllers
         }
 
         // POST: Comment/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NotificationId,Description")] Comment comment)//
+        public async Task<IActionResult> Create([Bind("NotificationId,Description")] Comment comment)
         {
             if (ModelState.IsValid)
             {
+                comment.OwnerID = _userManager.GetUserId(User);
                 if(!await CheckIfUserAuthorizedForNotification(comment,NotificatinOperations.Create))
                 {
                     return Forbid();
                 }
-                comment.OwnerID = _userManager.GetUserId(User);
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction($"Details/{comment.NotificationId}","Notification");
+                return Redirect($"/Notification/Details/{comment.NotificationId}");
             }
             return BadRequest();
         }
@@ -110,13 +116,17 @@ namespace NoticeBoard.Controllers
             {
                 return NotFound();
             }
+            if(!await CheckIfUserAuthorizedForNotification(comment,NotificatinOperations.Update))
+            {
+                return Forbid();
+            }
+
             ViewData["NotificationId"] = new SelectList(_context.Notifications, "NotificationId", "NotificationId", comment.NotificationId);
             return View(comment);
         }
 
         // POST: Comment/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CommentId,NotificationId,OwnerID,Description")] Comment comment)
@@ -130,6 +140,11 @@ namespace NoticeBoard.Controllers
             {
                 try
                 {
+                    comment.OwnerID = _userManager.GetUserId(User);
+                    if(!await CheckIfUserAuthorizedForNotification(comment,NotificatinOperations.Update))
+                    {
+                        return Forbid();
+                    }
                     _context.Update(comment);
                     await _context.SaveChangesAsync();
                 }
@@ -144,7 +159,7 @@ namespace NoticeBoard.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return Redirect($"/Notification/Details/{comment.NotificationId}");
             }
             ViewData["NotificationId"] = new SelectList(_context.Notifications, "NotificationId", "NotificationId", comment.NotificationId);
             return View(comment);
@@ -159,11 +174,16 @@ namespace NoticeBoard.Controllers
             }
 
             var comment = await _context.Comments
-                .Include(c => c.Notification)
                 .FirstOrDefaultAsync(m => m.CommentId == id);
+            
             if (comment == null)
             {
                 return NotFound();
+            }
+            comment.OwnerID = _userManager.GetUserId(User);
+            if(!await CheckIfUserAuthorizedForNotification(comment,NotificatinOperations.Delete))
+            {
+                return Forbid();
             }
 
             return View(comment);
@@ -175,9 +195,13 @@ namespace NoticeBoard.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var comment = await _context.Comments.FindAsync(id);
+            if(!await CheckIfUserAuthorizedForNotification(comment,NotificatinOperations.Delete))
+            {
+                return Forbid();
+            }
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Redirect($"/Notification/Details/{comment.NotificationId}");
         }
 
         private bool CommentExists(int id)
