@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 namespace NoticeBoard.Authorization
 {
     public class NoticeAdministratorAuthorizationHandler:
-    AuthorizationHandler<OperationAuthorizationRequirement,Notification>
+    AuthorizationHandler<OperationAuthorizationRequirement,BaseModel>
     {
         protected override Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             OperationAuthorizationRequirement requirement,
-            Notification resource)
+            BaseModel resource)
         {
             if(context.User==null) 
                 return Task.CompletedTask;

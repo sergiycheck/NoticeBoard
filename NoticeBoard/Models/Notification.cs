@@ -5,11 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NoticeBoard.Models
 {
-    public class Notification
+    public class Notification:BaseModel
     {
         public int NotificationId{get;set;}
-        public string OwnerID { get; set; }//can i see contacts
-
         public string Name{get;set;}
 
         public string Description{get;set;}

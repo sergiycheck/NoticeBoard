@@ -54,8 +54,12 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     @*TODO:add controller for comments*@
-                    <a asp-controller="" asp-action="" asp-route-id="@comment.CommentId">Edit</a><span>|</span>
-                    <a asp-controller="" asp-action="" asp-route-id="@comment.CommentId">Delete</a>                   
+                    @if((await AuthorizationService.AuthorizeAsync(User,comment,NotificatinOperations.Update)).Succeeded)
+                    {
+                        <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.CommentId">Edit</a><span>|</span>
+                        <a asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.CommentId">Delete</a>     
+                    }
+              
                 }
 
             </td>
@@ -64,14 +68,27 @@
     }
 }
 
-@*Post comment without page reloading*@
+@*Post comment without page reloading using ajax*@
 
 @*TODO:add methods to post comments*@
-<form asp-action="PostComment">
+@if (User.Identity.IsAuthenticated)
+{
+<form method="post" asp-controller="Comment" asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
-        <label asp-for="Description" class="control-label"></label>
-        <input asp-for="Description" class="form-control" />
-        <span asp-validation-for="OwnerID" class="text-danger"></span>
+       <input type="number" name="NotificationId" value="@Model.NotificationId" class="form-control" readonly required hidden> @* use readonly insted of disabled *@
+        <label for="commentDescription" class="control-label">Post comment</label>
+        <input type="text" name="Description" id="commentDescription" class="form-control" placeholder="Enter comment" required/>
+        @* <span asp-validation-for="Description" class="text-danger"></span> *@
+    </div>
+    <div class="form-group text-right">
+        <input type="submit" value="Post" class="btn btn-primary" />
     </div>
 </form>
+}else
+{
+    <div role="form">
+        <input type="text" value="Login or Register to add comments" style="color: red;">
+    </div>
+}
+

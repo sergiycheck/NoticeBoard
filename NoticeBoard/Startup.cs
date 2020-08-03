@@ -17,6 +17,10 @@ using Microsoft.Extensions.Hosting;
     using NoticeBoard.Authorization;
 using NoticeBoard.Helpers;
 
+
+//TODO: add custom user https://docs.microsoft.com/ru-ru/aspnet/core/security/authentication/add-user-data?view=aspnetcore-3.1&tabs=netcore-cli
+//TODO: rewrite pages to controllers
+//TODO: custom authorization service
 namespace NoticeBoard
 {
     public class Startup

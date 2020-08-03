@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NoticeBoard.Authorization
 {
-    public class NoticetIsOwnerAuthorizationHandler:AuthorizationHandler<OperationAuthorizationRequirement,Notification>
+    public class NoticetIsOwnerAuthorizationHandler:AuthorizationHandler<OperationAuthorizationRequirement,BaseModel>
     {
         UserManager<IdentityUser> _userManager;
 
@@ -19,7 +19,7 @@ namespace NoticeBoard.Authorization
         protected override Task
             HandleRequirementAsync(AuthorizationHandlerContext context,
                                    OperationAuthorizationRequirement requirement,
-                                   Notification resource)
+                                   BaseModel resource)
         {
             if (context.User == null || resource == null)
             {
