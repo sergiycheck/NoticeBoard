@@ -202,6 +202,12 @@ namespace NoticeBoard.Controllers
                 return RedirectToAction();
             }
         }
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult AccessDenied(string returnUrl = null)
+        {
+            return View();
+        }
 
 
     }
