@@ -43,7 +43,7 @@ namespace NoticeBoard.Controllers
         public async Task<IActionResult> Index()
         {
             var isAuthorized = User.IsInRole(NotificationConstants.ContactAdministratorsRole);
-            if(!isAuthorized)
+            if(!isAuthorized)//if isAuthorized false !isAuthorized true
             {
                 return Forbid();
             }
@@ -121,7 +121,6 @@ namespace NoticeBoard.Controllers
                 return Forbid();
             }
 
-            ViewData["NotificationId"] = new SelectList(_context.Notifications, "NotificationId", "NotificationId", comment.NotificationId);
             return View(comment);
         }
 
@@ -129,7 +128,7 @@ namespace NoticeBoard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CommentId,NotificationId,OwnerID,Description")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("CommentId,NotificationId,Description")] Comment comment)
         {
             if (id != comment.CommentId)
             {
@@ -161,11 +160,11 @@ namespace NoticeBoard.Controllers
                 }
                 return Redirect($"/Notification/Details/{comment.NotificationId}");
             }
-            ViewData["NotificationId"] = new SelectList(_context.Notifications, "NotificationId", "NotificationId", comment.NotificationId);
             return View(comment);
         }
 
-        // GET: Comment/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -185,23 +184,10 @@ namespace NoticeBoard.Controllers
             {
                 return Forbid();
             }
-
-            return View(comment);
-        }
-
-        // POST: Comment/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var comment = await _context.Comments.FindAsync(id);
-            if(!await CheckIfUserAuthorizedForNotification(comment,NotificatinOperations.Delete))
-            {
-                return Forbid();
-            }
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
             return Redirect($"/Notification/Details/{comment.NotificationId}");
+
         }
 
         private bool CommentExists(int id)

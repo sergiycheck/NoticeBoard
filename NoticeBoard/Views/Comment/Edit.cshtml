@@ -14,14 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="CommentId" />
             <div class="form-group">
-                <label asp-for="NotificationId" class="control-label"></label>
-                <select asp-for="NotificationId" class="form-control" asp-items="ViewBag.NotificationId"></select>
-                <span asp-validation-for="NotificationId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OwnerID" class="control-label"></label>
-                <input asp-for="OwnerID" class="form-control" />
-                <span asp-validation-for="OwnerID" class="text-danger"></span>
+                <input asp-for="NotificationId" class="form-control" hidden readonly>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>

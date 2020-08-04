@@ -53,11 +53,14 @@
             <td>
                 @if (User.Identity.IsAuthenticated)
                 {
-                    @*TODO:add controller for comments*@
                     @if((await AuthorizationService.AuthorizeAsync(User,comment,NotificatinOperations.Update)).Succeeded)
                     {
-                        <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.CommentId">Edit</a><span>|</span>
-                        <a asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.CommentId">Delete</a>     
+                        <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.CommentId">Edit</a>
+                    
+                        <form asp-controller="Comment" asp-action="Delete">
+                            <input type="hidden" name="id" value="@comment.CommentId" />
+                            <input type="submit" value="Delete" class="btn btn-danger" /> 
+                        </form>
                     }
               
                 }
@@ -70,7 +73,6 @@
 
 @*Post comment without page reloading using ajax*@
 
-@*TODO:add methods to post comments*@
 @if (User.Identity.IsAuthenticated)
 {
 <form method="post" asp-controller="Comment" asp-action="Create">
