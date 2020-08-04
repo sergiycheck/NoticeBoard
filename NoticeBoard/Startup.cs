@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
     using Microsoft.AspNetCore.Authorization;
     using NoticeBoard.Authorization;
 using NoticeBoard.Helpers;
+using Microsoft.AspNetCore.Http;
 
 
 //TODO: add custom user https://docs.microsoft.com/ru-ru/aspnet/core/security/authentication/add-user-data?view=aspnetcore-3.1&tabs=netcore-cli
@@ -75,6 +76,8 @@ namespace NoticeBoard
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = false;
+                
+                //options.SignIn.RequireConfirmedAccount
             });
 
             services.ConfigureApplicationCookie(options =>
@@ -83,8 +86,8 @@ namespace NoticeBoard
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
-                options.LoginPath = "/Identity/Account/Login";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.LoginPath = new PathString("/CustomAccount/Login");//"/Identity/Account/Login";//change here
+                options.AccessDeniedPath = new PathString("/CustomAccount/AccessDenied");;//"/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
 

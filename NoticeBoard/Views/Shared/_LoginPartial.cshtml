@@ -9,7 +9,7 @@
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
     </li>
     <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" 
+        <form  class="form-inline" asp-controller="CustomAccount" asp-action="Logout" 
         asp-route-returnUrl="@Url.Action("Index", "Notification", new { area = "" })" method="POST">
             <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
         </form>
@@ -18,10 +18,10 @@
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        <a class="nav-link text-dark" asp-controller="CustomAccount" asp-action="Register">Register</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        <a class="nav-link text-dark" asp-controller="CustomAccount" asp-action="Login">Login</a>
     </li>
 }
 </ul>

@@ -76,6 +76,7 @@ namespace NoticeBoard.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userName = User.Identity.Name;
                 notification.OwnerID = _userManager.GetUserId(User);
                 if(!await CheckIfUserAuthorizedForNotification(notification,NotificatinOperations.Create))
                 {
