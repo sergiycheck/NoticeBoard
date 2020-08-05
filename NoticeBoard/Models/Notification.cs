@@ -7,9 +7,7 @@ namespace NoticeBoard.Models
 {
     public class Notification:BaseModel
     {
-        public int NotificationId{get;set;}
         public string Name{get;set;}
-
         public string Description{get;set;}
         public ICollection<Comment>Comments{get;set;}
 

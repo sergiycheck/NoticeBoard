@@ -18,7 +18,7 @@ namespace NoticeBoard.Repositories
         }
         public bool NotificationsExists(int id)
         {
-            return _dbContext.Notifications.Any(e => e.NotificationId == id);
+            return _dbContext.Notifications.Any(e => e.Id == id);
         }
     }
 }

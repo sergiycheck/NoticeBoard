@@ -46,7 +46,7 @@ namespace NoticeBoard.Controllers
             var notification = await _context.Notifications
                 .AsNoTracking()
                 .Include(n=>n.Comments)
-                .FirstOrDefaultAsync(m => m.NotificationId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (notification == null)
             {
                 return NotFound();
@@ -113,7 +113,7 @@ namespace NoticeBoard.Controllers
             var notification = await _context
                 .Notifications
                 .AsNoTracking()
-                .FirstOrDefaultAsync(n=>n.NotificationId==id);
+                .FirstOrDefaultAsync(n=>n.Id==id);
             if (notification == null)
             {
                 return NotFound();
@@ -130,9 +130,9 @@ namespace NoticeBoard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NotificationId,Name,Description")] Notification notification)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Notification notification)
         {
-            if (id != notification.NotificationId)
+            if (id != notification.Id)
             {
                 return NotFound();
             }
@@ -142,7 +142,7 @@ namespace NoticeBoard.Controllers
                 try
                 {
                     var notificationDb = await _context.Notifications.AsNoTracking()
-                                        .FirstOrDefaultAsync(n=>n.NotificationId==id);
+                                        .FirstOrDefaultAsync(n=>n.Id==id);
                     if(notificationDb==null)
                     {
                         return NotFound();
@@ -158,7 +158,7 @@ namespace NoticeBoard.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NotificationExists(notification.NotificationId))
+                    if (!NotificationExists(notification.Id))
                     {
                         return NotFound();
                     }
@@ -182,7 +182,7 @@ namespace NoticeBoard.Controllers
             }
 
             var notification = await _context.Notifications
-                .FirstOrDefaultAsync(m => m.NotificationId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (notification == null)
             {
@@ -204,7 +204,7 @@ namespace NoticeBoard.Controllers
         {
             var notification = await _context.Notifications
             .AsNoTracking()
-            .FirstOrDefaultAsync(n=>n.NotificationId==id);
+            .FirstOrDefaultAsync(n=>n.Id==id);
             if(notification==null)
             {
                 return NotFound();
@@ -222,7 +222,7 @@ namespace NoticeBoard.Controllers
 
         private bool NotificationExists(int id)
         {
-            return _context.Notifications.Any(e => e.NotificationId == id);
+            return _context.Notifications.Any(e => e.Id == id);
         }
     }
 }

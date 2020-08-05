@@ -40,15 +40,15 @@
                 {
                     @if((await AuthorizationService.AuthorizeAsync(User,item,NotificatinOperations.Update)).Succeeded)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.NotificationId">Edit</a><span>|</span>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a><span>|</span>
                     }
                     @if((await AuthorizationService.AuthorizeAsync(User,item,NotificatinOperations.Delete)).Succeeded)
                     {
-                        <a asp-action="Delete" asp-route-id="@item.NotificationId">Delete</a><span>|</span>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a><span>|</span>
                     }
                     
                 }
-                <a asp-action="Details" asp-route-id="@item.NotificationId">Details</a>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
 
             </td>
         </tr>

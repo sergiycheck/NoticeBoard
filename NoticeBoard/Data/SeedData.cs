@@ -130,37 +130,37 @@ namespace NoticeBoard.Data
             {
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).NotificationId,
+                    Id = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).Id,
                     OwnerID = adminID,
                     Description="Test comment for 0 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).NotificationId,
+                    Id = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).Id,
                     OwnerID = adminID,
                     Description="Test 1 comment for 0 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).NotificationId,
+                    Id = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).Id,
                     OwnerID = adminID,
                     Description="Test 3 comment for 0 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[1].Name).NotificationId,
+                    Id = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[1].Name).Id,
                     OwnerID = adminID,
                     Description="Test 1 comment for 1 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[1].Name).NotificationId,
+                    Id = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[1].Name).Id,
                     OwnerID = adminID,
                     Description="Test 2 comment for 1 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[2].Name).NotificationId,
+                    Id = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[2].Name).Id,
                     OwnerID = adminID,
                     Description="Test 1 comment for 2 notification content"
                 }

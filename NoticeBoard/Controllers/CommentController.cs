@@ -67,7 +67,7 @@ namespace NoticeBoard.Controllers
 
             var comment = await _context.Comments
                 .Include(c => c.Notification)
-                .FirstOrDefaultAsync(m => m.CommentId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (comment == null)
             {
                 return NotFound();
@@ -128,9 +128,9 @@ namespace NoticeBoard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CommentId,NotificationId,Description")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NotificationId,Description")] Comment comment)
         {
-            if (id != comment.CommentId)
+            if (id != comment.Id)
             {
                 return NotFound();
             }
@@ -149,7 +149,7 @@ namespace NoticeBoard.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CommentExists(comment.CommentId))
+                    if (!CommentExists(comment.Id))
                     {
                         return NotFound();
                     }
@@ -173,7 +173,7 @@ namespace NoticeBoard.Controllers
             }
 
             var comment = await _context.Comments
-                .FirstOrDefaultAsync(m => m.CommentId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             
             if (comment == null)
             {
@@ -192,7 +192,7 @@ namespace NoticeBoard.Controllers
 
         private bool CommentExists(int id)
         {
-            return _context.Comments.Any(e => e.CommentId == id);
+            return _context.Comments.Any(e => e.Id == id);
         }
     }
 }

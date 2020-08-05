@@ -31,7 +31,7 @@
             User, Model,
             NotificatinOperations.Update)).Succeeded)
         {
-            <a asp-action="Edit" asp-route-id="@Model.NotificationId">Edit</a> 
+            <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> 
         }
         
     }
@@ -55,10 +55,10 @@
                 {
                     @if((await AuthorizationService.AuthorizeAsync(User,comment,NotificatinOperations.Update)).Succeeded)
                     {
-                        <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.CommentId">Edit</a>
+                        <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.Id">Edit</a>
                     
                         <form asp-controller="Comment" asp-action="Delete">
-                            <input type="hidden" name="id" value="@comment.CommentId" />
+                            <input type="hidden" name="id" value="@comment.Id" />
                             <input type="submit" value="Delete" class="btn btn-danger" /> 
                         </form>
                     }
@@ -78,7 +78,7 @@
 <form method="post" asp-controller="Comment" asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
-       <input type="number" name="NotificationId" value="@Model.NotificationId" class="form-control" readonly required hidden> @* use readonly insted of disabled *@
+       <input type="number" name="NotificationId" value="@Model.Id" class="form-control" readonly required hidden> @* use readonly insted of disabled *@
         <label for="commentDescription" class="control-label">Post comment</label>
         <input type="text" name="Description" id="commentDescription" class="form-control" placeholder="Enter comment" required/>
         @* <span asp-validation-for="Description" class="text-danger"></span> *@
