@@ -7,7 +7,7 @@ using NoticeBoard.Data;
 
 namespace NoticeBoard.Repositories
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseModel
     {
         protected readonly NoticeBoardDbContext _dbContext;
         protected readonly DbSet<TEntity> _dbSet;
@@ -23,7 +23,7 @@ namespace NoticeBoard.Repositories
         }
         public async Task<TEntity> GetById(int? id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(entity=>entity.Id==id);
         }
         public async Task Create(TEntity entity)
         {
@@ -40,6 +40,10 @@ namespace NoticeBoard.Repositories
         public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
+        }
+        public bool EntityExists(int id)
+        {
+            return _dbSet.Any(e => e.Id == id);
         }
     }
 }

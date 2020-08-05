@@ -1,10 +1,11 @@
 using NoticeBoard.Interfaces;
 using NoticeBoard.Models;
+using System.Threading.Tasks;
 
 namespace NoticeBoard.Interfaces
 {
     public interface INotificationsRepository:IGenericRepository<Notification>
     {
-        bool NotificationsExists(int id);
+        Task<Notification> NotificationIncludeComments(int?id);
     }
 }

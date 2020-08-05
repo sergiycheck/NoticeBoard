@@ -9,17 +9,15 @@ namespace NoticeBoard.Controllers
 {
     public class DI_BaseController : Controller
     {
-        protected readonly NoticeBoardDbContext _context;
         protected readonly IAuthorizationService _authorizationService;
         protected readonly UserManager<IdentityUser> _userManager;
         protected readonly ILogger<DI_BaseController> _logger;
 
         public DI_BaseController(
-            NoticeBoardDbContext context,
             IAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager,ILogger<DI_BaseController> logger) : base()
+            UserManager<IdentityUser> userManager,
+            ILogger<DI_BaseController> logger) : base()
         {
-            _context = context;
             _userManager = userManager;
             _authorizationService = authorizationService;
             _logger = logger;

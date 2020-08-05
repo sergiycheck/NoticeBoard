@@ -17,6 +17,8 @@ using Microsoft.Extensions.Hosting;
     using NoticeBoard.Authorization;
 using NoticeBoard.Helpers;
 using Microsoft.AspNetCore.Http;
+using NoticeBoard.Interfaces;
+using NoticeBoard.Repositories;
 
 
 //TODO: add custom user https://docs.microsoft.com/ru-ru/aspnet/core/security/authentication/add-user-data?view=aspnetcore-3.1&tabs=netcore-cli
@@ -43,6 +45,9 @@ namespace NoticeBoard
                 .AddEntityFrameworkStores<NoticeBoardDbContext>();
             services.AddControllersWithViews();
            services.AddRazorPages();
+
+            services.AddTransient<ICommentsRepository,CommentsRepository>();
+            services.AddTransient<INotificationsRepository,NotificationsRepository>();
 
 
 

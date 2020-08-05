@@ -9,18 +9,24 @@ using NoticeBoard.Data;
 
 namespace NoticeBoard.Repositories
 {
-    public class NotificationsRepository : GenericRepository<Notification>, INotificationsRepository
+    public class CommentsRepository : GenericRepository<Comment>, ICommentsRepository
     {
-        public NotificationsRepository(NoticeBoardDbContext context)
+        public CommentsRepository(NoticeBoardDbContext context)
             : base(context)
         {
                
         }
-        public async Task<Notification> NotificationIncludeComments(int?id)
+        public  IQueryable<Comment> CommentsIncludeNotification()
+        {
+            return _dbSet
+                .AsNoTracking()
+                .Include(n=>n.Notification);
+        }
+        public async Task<Comment> CommentIncludeNotification(int?id)
         {
             return await _dbSet
                 .AsNoTracking()
-                .Include(n=>n.Comments)
+                .Include(c => c.Notification)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
     }

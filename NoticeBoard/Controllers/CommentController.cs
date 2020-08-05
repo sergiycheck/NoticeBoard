@@ -13,16 +13,20 @@ using Microsoft.AspNetCore.Identity;
 using NoticeBoard.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Logging;
+using NoticeBoard.Interfaces;
 
 namespace NoticeBoard.Controllers
 {
     public class CommentController : DI_BaseController
     {
-
-        public CommentController(NoticeBoardDbContext context,
+        private ICommentsRepository _repository;
+        public CommentController(
             IAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager,ILogger<DI_BaseController> logger):base(context,authorizationService,userManager,logger)
-        {    
+            UserManager<IdentityUser> userManager,
+            ILogger<DI_BaseController> logger,
+            ICommentsRepository repository):base(authorizationService,userManager,logger)
+        {
+            _repository = repository;    
         }
 
         private async Task<bool> CheckIfUserAuthorizedForNotification(
@@ -47,7 +51,7 @@ namespace NoticeBoard.Controllers
             {
                 return Forbid();
             }
-            var noticeBoardDbContext = _context.Comments.AsNoTracking().Include(c => c.Notification);
+            var noticeBoardDbContext = _repository.CommentsIncludeNotification();
             return View(await noticeBoardDbContext.ToListAsync());
         }
 
@@ -65,9 +69,7 @@ namespace NoticeBoard.Controllers
                 return Forbid();
             }
 
-            var comment = await _context.Comments
-                .Include(c => c.Notification)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _repository.CommentIncludeNotification(id);
             if (comment == null)
             {
                 return NotFound();
@@ -79,7 +81,7 @@ namespace NoticeBoard.Controllers
         // GET: Comment/Create
         public IActionResult Create()
         {
-            ViewData["NotificationId"] = new SelectList(_context.Notifications, "NotificationId", "NotificationId");
+            ViewData["NotificationId"] = new SelectList(_repository.GetAll(), "NotificationId", "NotificationId");
             return View();
         }
 
@@ -96,8 +98,8 @@ namespace NoticeBoard.Controllers
                 {
                     return Forbid();
                 }
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
+                await _repository.Create(comment);
+                await _repository.SaveChangesAsync();
                 return Redirect($"/Notification/Details/{comment.NotificationId}");
             }
             return BadRequest();
@@ -111,7 +113,7 @@ namespace NoticeBoard.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _repository.GetById(id);
             if (comment == null)
             {
                 return NotFound();
@@ -144,8 +146,8 @@ namespace NoticeBoard.Controllers
                     {
                         return Forbid();
                     }
-                    _context.Update(comment);
-                    await _context.SaveChangesAsync();
+                    _repository.Update(comment);
+                    await _repository.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -172,8 +174,7 @@ namespace NoticeBoard.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _repository.GetById(id);
             
             if (comment == null)
             {
@@ -184,15 +185,15 @@ namespace NoticeBoard.Controllers
             {
                 return Forbid();
             }
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+            await _repository.Delete(id);
+            await _repository.SaveChangesAsync();
             return Redirect($"/Notification/Details/{comment.NotificationId}");
 
         }
 
         private bool CommentExists(int id)
         {
-            return _context.Comments.Any(e => e.Id == id);
+            return _repository.EntityExists(id);
         }
     }
 }

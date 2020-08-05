@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using NoticeBoard.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Logging;
+using NoticeBoard.Interfaces;
 
 
 namespace NoticeBoard.Controllers
@@ -19,11 +20,14 @@ namespace NoticeBoard.Controllers
     public class NotificationController : DI_BaseController
     {
 
-
-        public NotificationController(NoticeBoardDbContext context,
+        private INotificationsRepository _repository;
+        public NotificationController(
             IAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager,ILogger<DI_BaseController> logger):base(context,authorizationService,userManager,logger)
-        {    
+            UserManager<IdentityUser> userManager,
+            ILogger<DI_BaseController> logger,
+            INotificationsRepository repository):base(authorizationService,userManager,logger)
+        {
+            _repository = repository;    
         }
 
         // GET: Notification
@@ -31,7 +35,7 @@ namespace NoticeBoard.Controllers
         public async Task<IActionResult> Index()
         {
             _logger.LogInformation("method: Get. Notification controller index");
-            return View(await _context.Notifications.AsNoTracking().ToListAsync());
+            return View(await _repository.GetAll().ToListAsync());
         }
 
         // GET: Notification/Details/5
@@ -43,10 +47,7 @@ namespace NoticeBoard.Controllers
                 return NotFound();
             }
 
-            var notification = await _context.Notifications
-                .AsNoTracking()
-                .Include(n=>n.Comments)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var notification = await _repository.NotificationIncludeComments(id);
             if (notification == null)
             {
                 return NotFound();
@@ -83,8 +84,8 @@ namespace NoticeBoard.Controllers
                     return Forbid();
                 }
 
-                _context.Add(notification);
-                await _context.SaveChangesAsync();
+                await _repository.Create(notification);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(notification);
@@ -110,10 +111,7 @@ namespace NoticeBoard.Controllers
             {
                 return NotFound();
             }
-            var notification = await _context
-                .Notifications
-                .AsNoTracking()
-                .FirstOrDefaultAsync(n=>n.Id==id);
+            var notification = await _repository.NotificationIncludeComments(id);
             if (notification == null)
             {
                 return NotFound();
@@ -141,8 +139,7 @@ namespace NoticeBoard.Controllers
             {
                 try
                 {
-                    var notificationDb = await _context.Notifications.AsNoTracking()
-                                        .FirstOrDefaultAsync(n=>n.Id==id);
+                    var notificationDb = await _repository.GetById(id);
                     if(notificationDb==null)
                     {
                         return NotFound();
@@ -153,8 +150,8 @@ namespace NoticeBoard.Controllers
                     {
                         return Forbid();
                     }
-                    _context.Update(notification);
-                    await _context.SaveChangesAsync();
+                    _repository.Update(notification);
+                    await _repository.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -181,8 +178,7 @@ namespace NoticeBoard.Controllers
                 return NotFound();
             }
 
-            var notification = await _context.Notifications
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var notification = await _repository.GetById(id);
 
             if (notification == null)
             {
@@ -202,9 +198,7 @@ namespace NoticeBoard.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var notification = await _context.Notifications
-            .AsNoTracking()
-            .FirstOrDefaultAsync(n=>n.Id==id);
+            var notification = await _repository.GetById(id);
             if(notification==null)
             {
                 return NotFound();
@@ -215,14 +209,14 @@ namespace NoticeBoard.Controllers
                 return Forbid();
             }
 
-            _context.Notifications.Remove(notification);
-            await _context.SaveChangesAsync();
+            await _repository.Delete(id);
+            await _repository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool NotificationExists(int id)
         {
-            return _context.Notifications.Any(e => e.Id == id);
+            return _repository.EntityExists(id);
         }
     }
 }
