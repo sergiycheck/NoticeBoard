@@ -23,6 +23,6 @@ namespace NoticeBoard.Authorization
         public static readonly string DeleteOperationName = "Delete";
         public static readonly string ContactAdministratorsRole = 
                                                               "NotificationAdministrators";
-        //TODO:add more constans
+        //TODO:add more constants
     }
 }

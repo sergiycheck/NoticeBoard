@@ -14,6 +14,7 @@ using NoticeBoard.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Logging;
 using NoticeBoard.Interfaces;
+using NoticeBoard.Helpers;
 
 namespace NoticeBoard.Controllers
 {
@@ -21,7 +22,7 @@ namespace NoticeBoard.Controllers
     {
         private ICommentsRepository _repository;
         public CommentController(
-            IAuthorizationService authorizationService,
+            ICustomAuthorizationService authorizationService,
             UserManager<IdentityUser> userManager,
             ILogger<DI_BaseController> logger,
             ICommentsRepository repository):base(authorizationService,userManager,logger)

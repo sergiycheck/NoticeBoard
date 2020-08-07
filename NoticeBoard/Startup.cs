@@ -21,9 +21,6 @@ using NoticeBoard.Interfaces;
 using NoticeBoard.Repositories;
 
 
-//TODO: add custom user https://docs.microsoft.com/ru-ru/aspnet/core/security/authentication/add-user-data?view=aspnetcore-3.1&tabs=netcore-cli
-//TODO: rewrite pages to controllers
-//TODO: custom authorization service
 namespace NoticeBoard
 {
     public class Startup
@@ -102,7 +99,7 @@ namespace NoticeBoard
                                                                       //usign AddScoped
 
             //TODO:try to implement customAuthorizationSerivce for better testing (descriptor error)
-            //services.AddSingleton<ICustomAuthorizationService, CustomAuthorizationService>();
+            services.AddScoped<ICustomAuthorizationService, CustomAuthorizationService>();
 
             services.AddSingleton<IAuthorizationHandler,
                                 NoticeAdministratorAuthorizationHandler>();

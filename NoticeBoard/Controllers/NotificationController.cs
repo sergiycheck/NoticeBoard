@@ -13,6 +13,7 @@ using NoticeBoard.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Logging;
 using NoticeBoard.Interfaces;
+using NoticeBoard.Helpers;
 
 
 namespace NoticeBoard.Controllers
@@ -22,7 +23,7 @@ namespace NoticeBoard.Controllers
 
         private INotificationsRepository _repository;
         public NotificationController(
-            IAuthorizationService authorizationService,
+            ICustomAuthorizationService authorizationService,
             UserManager<IdentityUser> userManager,
             ILogger<DI_BaseController> logger,
             INotificationsRepository repository):base(authorizationService,userManager,logger)

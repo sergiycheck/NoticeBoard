@@ -16,6 +16,12 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using NoticeBoard.Authorization;
 using Microsoft.Extensions.Logging;
+using NoticeBoard.Repositories;
+using NoticeBoard.Helpers;
+using NSubstitute;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 
 //in directory NoticeBoard.XUnitTest execute following command to add reference to testing project
@@ -28,6 +34,8 @@ namespace NoticeBoard.XUnitTests
     {
         public NotificationControllerTests(SqlServerControllerTests fixture) => Fixture = fixture;
         public SqlServerControllerTests Fixture { get; }
+
+        //cannot use CreateHostBuilder because of configuration, connection strings and long pileline
         [Fact]
         public async Task TestIdexReturnViewResult()
         {
@@ -40,10 +48,12 @@ namespace NoticeBoard.XUnitTests
 
                 using (var context = Fixture.CreateContext(transaction))
                 {
-                    var mockAuthorizationService = new Mock<IAuthorizationService>();
+                    var mockAuthorizationService = new Mock<ICustomAuthorizationService>();
                     var mockUserManager = new Mock<UserManager<IdentityUser>>();
                     //var mockAuthorizationResult = new Mock<AuthorizationResult>();
                     //mockAuthorizationResult.SetupGet(r => r.Succeeded).Returns(true);
+                    var mockLogger = new Mock<ILogger<DI_BaseController>>();
+                    ILogger<DI_BaseController> logger = mockLogger.Object;
                     var mockUser = new Mock<ClaimsPrincipal>();
                     mockUser.SetupGet(user => user.Identity.IsAuthenticated).Returns(true);
 
@@ -53,10 +63,12 @@ namespace NoticeBoard.XUnitTests
                             mockUser.Object,
                             context.Notifications.AsNoTracking().FirstOrDefault(),
                             NotificatinOperations.Update)).ReturnsAsync(AuthorizationResult.Success());
-                    var controller = new NotificationController(context, 
+                            
+                    var controller = new NotificationController( 
                     mockAuthorizationService.Object,
                     It.IsAny<UserManager<IdentityUser>>(),
-                    It.IsAny<ILogger<DI_BaseController>>());
+                    logger,
+                    new NotificationsRepository(context));
 
                     //Act
                     var result = await controller.Index();
