@@ -23,7 +23,7 @@ namespace NoticeBoard.Controllers
         private ICommentsRepository _repository;
         public CommentController(
             ICustomAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager,
+            ICustomUserManager userManager,
             ILogger<DI_BaseController> logger,
             ICommentsRepository repository):base(authorizationService,userManager,logger)
         {

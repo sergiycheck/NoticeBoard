@@ -8,18 +8,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
+using NoticeBoard.Models;
 
 namespace NoticeBoard.AuthorizationsManagers
 {
-    public class CustomSignInManager : SignInManager<IdentityUser>, ICustomSignInManager
+    public class CustomSignInManager : SignInManager<CustomUser>, ICustomSignInManager
     {
-        public CustomSignInManager(UserManager<IdentityUser> userManager, 
+        public CustomSignInManager(UserManager<CustomUser> userManager, 
                                     IHttpContextAccessor contextAccessor, 
-                                    IUserClaimsPrincipalFactory<IdentityUser> claimsFactory, 
+                                    IUserClaimsPrincipalFactory<CustomUser> claimsFactory, 
                                     IOptions<IdentityOptions> optionsAccessor, 
-                                    ILogger<SignInManager<IdentityUser>> logger, 
+                                    ILogger<SignInManager<CustomUser>> logger, 
                                     IAuthenticationSchemeProvider schemes, 
-                                    IUserConfirmation<IdentityUser> confirmation) : base(userManager,
+                                    IUserConfirmation<CustomUser> confirmation) : base(userManager,
                                                                                          contextAccessor, 
                                                                                          claimsFactory, 
                                                                                          optionsAccessor, 
@@ -36,9 +38,13 @@ namespace NoticeBoard.AuthorizationsManagers
         public override Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
         {
             return base.PasswordSignInAsync(userName, password, isPersistent, lockoutOnFailure);
+        }        
+        public override Task<SignInResult> PasswordSignInAsync(CustomUser user, string password, bool isPersistent, bool lockoutOnFailure)
+        {
+            return base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         }
 
-        public override Task SignInAsync(IdentityUser user, bool isPersistent, string authenticationMethod = null)
+        public override Task SignInAsync(CustomUser user, bool isPersistent, string authenticationMethod = null)
         {
             return base.SignInAsync(user, isPersistent, authenticationMethod);
         }
@@ -46,6 +52,10 @@ namespace NoticeBoard.AuthorizationsManagers
         public override Task SignOutAsync()
         {
             return base.SignOutAsync();
+        }
+        public override bool IsSignedIn(ClaimsPrincipal principal)
+        {
+            return base.IsSignedIn(principal);
         }
     }
 }

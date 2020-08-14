@@ -19,6 +19,8 @@ using NoticeBoard.Helpers;
 using Microsoft.AspNetCore.Http;
 using NoticeBoard.Interfaces;
 using NoticeBoard.Repositories;
+using NoticeBoard.AuthorizationsManagers;
+using NoticeBoard.Models;
 
 
 namespace NoticeBoard
@@ -37,11 +39,11 @@ namespace NoticeBoard
             services.AddDbContext<NoticeBoardDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("NoticeBoardDb")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()//added roles
                 .AddEntityFrameworkStores<NoticeBoardDbContext>();
-            services.AddControllersWithViews();
-           services.AddRazorPages();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();;
+           services.AddRazorPages().AddRazorRuntimeCompilation();;
 
             services.AddTransient<ICommentsRepository,CommentsRepository>();
             services.AddTransient<INotificationsRepository,NotificationsRepository>();
@@ -104,12 +106,25 @@ namespace NoticeBoard
             services.AddSingleton<IAuthorizationHandler,
                                 NoticeAdministratorAuthorizationHandler>();
 
+            services.AddScoped<ICustomUserManager,CustomUserManager>();
+            services.AddScoped<ICustomSignInManager,CustomSignInManager>();
+
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.Use(async (context, next) =>
+            {
+                await next();
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Request.Path = "/CustomAccount/Error";
+                    await next();
+                }
+            });
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -117,7 +132,7 @@ namespace NoticeBoard
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/CustomAccount/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }

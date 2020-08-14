@@ -14,7 +14,8 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Logging;
 using NoticeBoard.Interfaces;
 using NoticeBoard.Helpers;
-
+using NoticeBoard.Models.ViewModels;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace NoticeBoard.Controllers
 {
@@ -24,7 +25,7 @@ namespace NoticeBoard.Controllers
         private INotificationsRepository _repository;
         public NotificationController(
             ICustomAuthorizationService authorizationService,
-            UserManager<IdentityUser> userManager,
+            ICustomUserManager userManager,
             ILogger<DI_BaseController> logger,
             INotificationsRepository repository):base(authorizationService,userManager,logger)
         {
@@ -53,8 +54,38 @@ namespace NoticeBoard.Controllers
             {
                 return NotFound();
             }
+            var commentViewModel = new List<CommentViewModel>();
+            var user = await _userManager.FindByIdAsync(notification.OwnerID);
 
-            return View(notification);
+            if (notification.Comments != null) 
+            {
+                foreach (var el in notification.Comments)
+                {
+                    var Owner = await _userManager.FindByIdAsync(el.OwnerID);
+                    if (Owner != null)
+                    {
+                        var OwnerName = Owner.UserName == null ? "" : $"{Owner.UserName} ({Owner.FirstName} {Owner.LastName})";
+                        commentViewModel.Add(
+                            new CommentViewModel()
+                            {
+                                Comment = el,
+                                OwnerName = OwnerName
+
+                            });
+                    }
+
+                }
+
+            }
+            var NotificationViewModel = new NotificationViewModel()
+            {
+                Notification = notification,
+                OwnerName = $"{user.UserName} ({user.FirstName} {user.LastName})",
+                CommentViewModel = commentViewModel
+            };
+
+
+            return View(NotificationViewModel);
         }
         //TODO:add method or controller to post comments
 

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using NoticeBoard.Interfaces;
 
 namespace NoticeBoard.Data
 {
@@ -31,12 +32,12 @@ namespace NoticeBoard.Data
         private static async Task<string> EnsureUser(IServiceProvider serviceProvider,
                                                     string testUserPw, string UserName)
         {
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetService<ICustomUserManager>();
 
             var user = await userManager.FindByNameAsync(UserName);
             if (user == null)
             {
-                user = new IdentityUser {
+                user = new CustomUser {
                     UserName = UserName,
                     EmailConfirmed = true
                 };
@@ -67,7 +68,7 @@ namespace NoticeBoard.Data
                 IR = await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetService<ICustomUserManager>();
 
             var user = await userManager.FindByIdAsync(uid);
 

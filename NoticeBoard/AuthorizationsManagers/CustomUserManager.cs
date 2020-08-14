@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NoticeBoard.Interfaces;
+using NoticeBoard.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,33 +11,35 @@ using System.Threading.Tasks;
 
 namespace NoticeBoard.AuthorizationsManagers
 {
-    public class CustomUserManager : UserManager<IdentityUser>, ICustomUserManager
+    public class CustomUserManager : UserManager<CustomUser>, ICustomUserManager
     {
-        public CustomUserManager(IUserStore<IdentityUser> store, IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<IdentityUser> passwordHasher, IEnumerable<IUserValidator<IdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<IdentityUser>> passwordValidators, ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<IdentityUser>> logger)
+        public CustomUserManager(IUserStore<CustomUser> store, IOptions<IdentityOptions> optionsAccessor,
+            IPasswordHasher<CustomUser> passwordHasher, IEnumerable<IUserValidator<CustomUser>> userValidators,
+            IEnumerable<IPasswordValidator<CustomUser>> passwordValidators, ILookupNormalizer keyNormalizer,
+            IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<CustomUser>> logger)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
         }
-        public override Task<IdentityResult> CreateAsync(IdentityUser user, string password)
+        public new IdentityOptions Options{get=> base.Options;set=>base.Options=value;}//not sure here
+        
+        public override Task<IdentityResult> CreateAsync(CustomUser user, string password)
         {
             return base.CreateAsync(user, password);
         }
 
-        public override Task<IdentityResult> CreateAsync(IdentityUser user)
+        public override Task<IdentityResult> CreateAsync(CustomUser user)
         {
             return base.CreateAsync(user);
         }
 
-        public override Task<IdentityUser> FindByEmailAsync(string email)
+        public override Task<CustomUser> FindByEmailAsync(string email)
         {
-            return base.FindByNameAsync(email);
+            return base.FindByEmailAsync(email);
         }
 
-        public override Task<string> GenerateEmailConfirmationTokenAsync(IdentityUser user)
+        public override Task<string> GenerateEmailConfirmationTokenAsync(CustomUser user)
         {
-            return base.GetAuthenticatorKeyAsync(user);
+            return base.GenerateEmailConfirmationTokenAsync(user);
         }
 
         public override string GetUserId(ClaimsPrincipal principal)
@@ -44,9 +47,21 @@ namespace NoticeBoard.AuthorizationsManagers
             return base.GetUserId(principal);
         }
 
-        public override Task<string> GetUserIdAsync(IdentityUser user)
+        public override Task<string> GetUserIdAsync(CustomUser user)
         {
             return base.GetUserIdAsync(user);
+        }
+        public override Task<CustomUser> FindByNameAsync(string userName)
+        {
+            return base.FindByNameAsync(userName);
+        }
+        public override Task<CustomUser> FindByIdAsync(string userId)
+        {
+            return base.FindByIdAsync(userId);
+        }
+        public override Task<IdentityResult> AddToRoleAsync(CustomUser user, string role)
+        {
+            return base.AddToRoleAsync(user,role);
         }
     }
 }

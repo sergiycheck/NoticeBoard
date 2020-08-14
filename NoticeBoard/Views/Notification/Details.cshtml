@@ -1,96 +1,106 @@
-@model NoticeBoard.Models.Notification
+@model NoticeBoard.Models.ViewModels.NotificationViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
+<div class="mb-5">
 
-<div>
-    <h4>Notification</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    @if (User.Identity.IsAuthenticated)
-    {
-        @if ((await AuthorizationService.AuthorizeAsync(
-            User, Model,
-            NotificatinOperations.Update)).Succeeded)
+
+    <div>
+        <h4>Notification</h4>
+        <span>@Model.OwnerName</span>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Notification.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Notification.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Notification.Description)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Notification.Description)
+            </dd>
+        </dl>
+    </div>
+    <div>
+        @if (User.Identity.IsAuthenticated)
         {
-            <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> 
+            @if ((await AuthorizationService.AuthorizeAsync(
+               User, Model,
+               NotificatinOperations.Update)).Succeeded)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Notification.Id">Edit</a>
+            }
+
         }
-        
-    }
-    <a asp-action="Index">Back to List</a>
-</div>
+        <a asp-action="Index">Back to List</a>
+    </div>
 
-@{
-    if(Model.Comments!=null)
-    {
-        @foreach(var comment in Model.Comments)
-        {
-        <tr>
-            <td>
-                <p>@comment.OwnerID</p>
-            </td>
-            <td>
-                <p>@comment.Description</p>
-            </td>
-            <td>
-                @if (User.Identity.IsAuthenticated)
+    <div>
+        @{
+            if (Model.CommentViewModel != null)
+            {
+                @foreach (var comment in Model.CommentViewModel)
                 {
-                    @if((await AuthorizationService.AuthorizeAsync(User,comment,NotificatinOperations.Update)).Succeeded)
-                    {
-                        <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.Id">Edit</a>
-                    
-                        <form asp-controller="Comment" asp-action="Delete">
-                            <input type="hidden" name="id" value="@comment.Id" />
-                            <input type="submit" value="Delete" class="btn btn-danger" /> 
-                        </form>
-                    }
-              
+                    <tr>
+                        <td>
+                            <p>@comment.OwnerName</p>
+                        </td>
+                        <td>
+                            <p>@comment.Comment.Description</p>
+                        </td>
+                        <td>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @if ((await AuthorizationService.AuthorizeAsync(User, comment, NotificatinOperations.Update)).Succeeded)
+                                {
+                                    <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.Comment.Id">Edit</a>
+
+                                    <form asp-controller="Comment" asp-action="Delete">
+                                        <input type="hidden" name="id" value="@comment.Comment.Id" />
+                                        <input type="submit" value="Delete" class="btn btn-danger" />
+                                    </form>
+                                }
+
+                            }
+
+                        </td>
+                    </tr>
                 }
-
-            </td>
-        </tr>
+            }
         }
-    }
-}
+    </div>
 
-@*Post comment without page reloading using ajax*@
 
-@if (User.Identity.IsAuthenticated)
-{
-<form method="post" asp-controller="Comment" asp-action="Create">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-       <input type="number" name="NotificationId" value="@Model.Id" class="form-control" readonly required hidden> @* use readonly insted of disabled *@
-        <label for="commentDescription" class="control-label">Post comment</label>
-        <input type="text" name="Description" id="commentDescription" class="form-control" placeholder="Enter comment" required/>
-        @* <span asp-validation-for="Description" class="text-danger"></span> *@
+    <div class="comment-tabs">
+        @*Post comment without page reloading using ajax*@
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form method="post" asp-controller="Comment" asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <input type="number" name="NotificationId" value="@Model.Notification.Id" class="form-control" readonly required hidden> @* use readonly insted of disabled *@
+                    <label for="commentDescription" class="control-label">Post comment</label>
+                    <input type="text" name="Description" id="commentDescription" class="form-control" placeholder="Enter comment" required />
+                    @* <span asp-validation-for="Description" class="text-danger"></span> *@
+                </div>
+                <div class="form-group text-right">
+                    <input type="submit" value="Post" class="btn btn-primary" />
+                </div>
+            </form>
+        }
+        else
+        {
+            <div role="form" class="form-group">
+                <input type="text" value="Login or Register to add comments" style="color: red;" class="form-control" readonly>
+            </div>
+        }
     </div>
-    <div class="form-group text-right">
-        <input type="submit" value="Post" class="btn btn-primary" />
-    </div>
-</form>
-}else
-{
-    <div role="form" class="form-group">
-        <input type="text" value="Login or Register to add comments" style="color: red;" class="form-control" readonly>
-    </div>
-}
+</div>
 

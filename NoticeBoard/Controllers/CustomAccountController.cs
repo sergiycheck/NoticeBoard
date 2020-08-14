@@ -14,14 +14,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using NoticeBoard.Models.ViewModels;
+using NoticeBoard.Interfaces;
+using NoticeBoard.Models;
 
 
 namespace NoticeBoard.Controllers
 {
     public class CustomAccountController:Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly ICustomSignInManager _signInManager;
+        private readonly ICustomUserManager _userManager;
         private readonly ILogger<CustomAccountController> _logger;
         private readonly IEmailSender _emailSender;
 
@@ -29,8 +31,8 @@ namespace NoticeBoard.Controllers
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public CustomAccountController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            ICustomUserManager userManager,
+            ICustomSignInManager signInManager,
             ILogger<CustomAccountController> logger,
             IEmailSender emailSender)
         {
@@ -43,18 +45,28 @@ namespace NoticeBoard.Controllers
         public async Task<IActionResult> Register(string returnUrl = null)
         {
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            return View(new RegisterInputModel(){ReturnUrl=returnUrl});
+            return View(new RegisterInputModel(){ReturnUrl=returnUrl==null?"/":returnUrl});
         }
         [AllowAnonymous]
         [HttpPost, ActionName("Register")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RegisterConfirmed([Bind("Email,Password,ConfirmPassword")] RegisterInputModel Input)
+        public async Task<IActionResult> RegisterConfirmed(/*[Bind("Email,Password")]*/ RegisterInputModel Input)
         {
             var returnUrl = Input.ReturnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new CustomUser 
+                { 
+                    UserName = Input.UserName,
+                    Email = Input.Email,
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    PhoneNumber = Input.PhoneNumber,
+                    Country = Input.Country,
+                    City = Input.City,
+                    Address = Input.Address
+                    };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -154,7 +166,11 @@ namespace NoticeBoard.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                //can passwordSignInAsync(TUser user ...) first have to check whene user exists and return it
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+                if (user == null) return NotFound();
+
+                var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
@@ -205,6 +221,12 @@ namespace NoticeBoard.Controllers
         [AllowAnonymous]
         [HttpGet]
         public IActionResult AccessDenied(string returnUrl = null)
+        {
+            return View();
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Error(string returnUrl = null)
         {
             return View();
         }

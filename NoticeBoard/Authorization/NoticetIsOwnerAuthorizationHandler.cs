@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using NoticeBoard.AuthorizationsManagers;
+using NoticeBoard.Interfaces;
 
 namespace NoticeBoard.Authorization
 {
     public class NoticetIsOwnerAuthorizationHandler:AuthorizationHandler<OperationAuthorizationRequirement,BaseModel>
     {
-        UserManager<IdentityUser> _userManager;
+        ICustomUserManager _userManager;
 
-        public NoticetIsOwnerAuthorizationHandler(UserManager<IdentityUser> 
+        public NoticetIsOwnerAuthorizationHandler(ICustomUserManager
             userManager)
         {
             _userManager = userManager;

@@ -6,6 +6,7 @@ using NoticeBoard.Interfaces;
 using NoticeBoard.Models;
 using Microsoft.EntityFrameworkCore;
 using NoticeBoard.Data;
+using NoticeBoard.Models.ViewModels;
 
 namespace NoticeBoard.Repositories
 {
@@ -23,5 +24,6 @@ namespace NoticeBoard.Repositories
                 .Include(n=>n.Comments)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
+        
     }
 }
