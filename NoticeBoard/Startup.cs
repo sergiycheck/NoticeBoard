@@ -42,8 +42,8 @@ namespace NoticeBoard
             services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()//added roles
                 .AddEntityFrameworkStores<NoticeBoardDbContext>();
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();;
-           services.AddRazorPages().AddRazorRuntimeCompilation();;
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();//https://stackoverflow.com/questions/58203748/is-live-reload-with-in-process-aspnet-core-3-possible
+           services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddTransient<ICommentsRepository,CommentsRepository>();
             services.AddTransient<INotificationsRepository,NotificationsRepository>();

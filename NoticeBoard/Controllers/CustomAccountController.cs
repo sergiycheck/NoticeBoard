@@ -118,11 +118,9 @@ namespace NoticeBoard.Controllers
             {
                 Email = email,
                 DisplayConfirmAccountLink = true//set to true if you want to display page for registerconfirmation
-            };
-            
-
+            };            
             //TODO: add email sender and confirmation https://app.sendgrid.com/
-            
+
             if (registerConfirmationViewModel.DisplayConfirmAccountLink)
             {
                 var userId = await _userManager.GetUserIdAsync(user);

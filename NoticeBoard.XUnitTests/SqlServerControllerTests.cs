@@ -8,7 +8,7 @@ namespace NoticeBoard.Tests
 {
     public class SqlServerControllerTests:IDisposable
     {
-        public const string ConnectionString = "Server=(localdb)\\mssqllocaldb;Database=NoticeBoardMvcApp;Trusted_Connection=True;MultipleActiveResultSets=true";
+        public static string ConnectionString = "Server=(localdb)\\mssqllocaldb;Database=NoticeBoardMvcApp;Trusted_Connection=True;MultipleActiveResultSets=true";
         public SqlServerControllerTests()
         {
             Connection = new SqlConnection(ConnectionString);
