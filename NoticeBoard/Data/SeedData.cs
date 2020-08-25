@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using NoticeBoard.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace NoticeBoard.Data
 {
@@ -18,14 +20,14 @@ namespace NoticeBoard.Data
             using (var context = new NoticeBoardDbContext(
                 serviceProvider.GetRequiredService<DbContextOptions<NoticeBoardDbContext>>()))
             {
-                // The admin user can do anything
+                // The admin user can do everything
 
                 var adminID = await EnsureUser(serviceProvider, adminPassword, "admin@custom.com");
                 await EnsureRole(serviceProvider, adminID, NotificationConstants.ContactAdministratorsRole);
 
                 //TODO:ensure more roles
 
-                SeedDB(context, adminID);
+                await SeedDB(context, adminID);
             }
         }
 
@@ -39,16 +41,11 @@ namespace NoticeBoard.Data
             {
                 user = new CustomUser {
                     UserName = UserName,
+                    Email = UserName,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(user, testUserPw);
             }
-
-            if (user == null)
-            {
-                throw new Exception("The password is probably not strong enough!");
-            }
-
             return user.Id;
         }
 
@@ -74,15 +71,19 @@ namespace NoticeBoard.Data
 
             if(user == null)
             {
-                throw new Exception("The testUserPw password was probably not strong enough!");
+                throw new Exception("User does not exists!");
             }
             
-            IR = await userManager.AddToRoleAsync(user, role);
+            if(!await userManager.IsInRoleAsync(user,role))
+            {
+                IR = await userManager.AddToRoleAsync(user, role);
+            }
+            
 
             return IR;
         }
 
-        public static void SeedDB(NoticeBoardDbContext context,string adminID)
+        public static async Task SeedDB(NoticeBoardDbContext context,string adminID)
         {
             var Notifications = new Notification[]
             {
@@ -117,15 +118,12 @@ namespace NoticeBoard.Data
                     OwnerID = adminID
                 }
             };
-            foreach(var notif in Notifications)
+            if(!context.Notifications.Any())
             {
-                var notifInDb = context.Notifications.AsNoTracking().Where(e=> e.Name== notif.Name&& e.OwnerID==notif.OwnerID).SingleOrDefault();
-                if(notifInDb==null)//if db does not contain the same item
-                {
-                    context.Notifications.Add(notif);
-                }
+                context.Notifications.AddRange(Notifications);
+                await context.SaveChangesAsync();
             }
-            context.SaveChanges();
+            
             
             var Comments = new Comment[]
             {
@@ -166,15 +164,12 @@ namespace NoticeBoard.Data
                     Description="Test 1 comment for 2 notification content"
                 }
             };
-            foreach(var com in Comments)//add initial data whenever
+            if(!context.Comments.Any())
             {
-                var comInDb = context.Comments.AsNoTracking().Where(e=> e.Description== com.Description&& e.OwnerID==com.OwnerID).SingleOrDefault();
-                if(comInDb==null)
-                {
-                    context.Comments.Add(com);
-                }
+                context.Comments.AddRange(Comments);
+                context.SaveChanges();
             }
-            context.SaveChanges();
+            
         }
 
 

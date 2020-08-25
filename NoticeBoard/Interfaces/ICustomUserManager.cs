@@ -19,5 +19,6 @@ namespace NoticeBoard.Interfaces
         Task<CustomUser> FindByNameAsync(string userName);
         Task<CustomUser> FindByIdAsync(string userId);
         Task<IdentityResult> AddToRoleAsync(CustomUser user, string role);
+        Task<bool> IsInRoleAsync(CustomUser user,string role);
     }
 }

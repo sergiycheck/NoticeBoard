@@ -31,7 +31,7 @@
         @if (User.Identity.IsAuthenticated)
         {
             @if ((await AuthorizationService.AuthorizeAsync(
-               User, Model,
+               User, Model.Notification,
                NotificatinOperations.Update)).Succeeded)
             {
                 <a asp-action="Edit" asp-route-id="@Model.Notification.Id">Edit</a>
@@ -57,7 +57,7 @@
                         <td>
                             @if (User.Identity.IsAuthenticated)
                             {
-                                @if ((await AuthorizationService.AuthorizeAsync(User, comment, NotificatinOperations.Update)).Succeeded)
+                                @if ((await AuthorizationService.AuthorizeAsync(User, comment.Comment, NotificatinOperations.Update)).Succeeded)
                                 {
                                     <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.Comment.Id">Edit</a>
 

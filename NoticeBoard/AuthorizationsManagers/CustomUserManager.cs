@@ -59,6 +59,10 @@ namespace NoticeBoard.AuthorizationsManagers
         {
             return base.FindByIdAsync(userId);
         }
+        public override Task<bool> IsInRoleAsync(CustomUser user,string role)
+        {
+            return base.IsInRoleAsync(user,role);
+        }
         public override Task<IdentityResult> AddToRoleAsync(CustomUser user, string role)
         {
             return base.AddToRoleAsync(user,role);

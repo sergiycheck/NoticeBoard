@@ -166,7 +166,11 @@ namespace NoticeBoard.Controllers
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 //can passwordSignInAsync(TUser user ...) first have to check whene user exists and return it
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null) return NotFound();
+                if (user == null)
+                {
+                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                     return View(new LoginViewModel(){ReturnUrl="/"});
+                } 
 
                 var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)

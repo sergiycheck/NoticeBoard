@@ -156,7 +156,7 @@ namespace NoticeBoard.XUnitTests
                             services.AddScoped<ICustomUserManager, CustomUserManager>();
                             services.AddScoped<ICustomSignInManager, CustomSignInManager>();
                         })
-                        .Configure(async app =>
+                        .Configure(app =>
                         {
                             //await Initialize(app.ApplicationServices,
                             //    _loginViewModels[0].Password,
@@ -166,6 +166,7 @@ namespace NoticeBoard.XUnitTests
                             app.Use(async (context, next) => //https://stackoverflow.com/questions/53514318/auto-login-on-debug-asp-net-core-2-1
                             {
                                 _signInManager = context.RequestServices.GetRequiredService<SignInManager<CustomUser>>();
+                                await next();
                             });
                         });
                 })

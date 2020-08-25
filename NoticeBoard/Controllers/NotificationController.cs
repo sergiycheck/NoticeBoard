@@ -62,7 +62,17 @@ namespace NoticeBoard.Controllers
                 foreach (var el in notification.Comments)
                 {
                     var Owner = await _userManager.FindByIdAsync(el.OwnerID);
-                    if (Owner != null)
+                    if (Owner == null)
+                    {
+                        var OwnerName = "Deleted user";
+                        commentViewModel.Add(
+                            new CommentViewModel()
+                            {
+                                Comment = el,
+                                OwnerName = OwnerName
+
+                            });
+                    }else
                     {
                         var OwnerName = Owner.UserName == null ? "" : $"{Owner.UserName} ({Owner.FirstName} {Owner.LastName})";
                         commentViewModel.Add(

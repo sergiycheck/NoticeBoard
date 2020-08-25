@@ -12,7 +12,8 @@ namespace NoticeBoard.Helpers
     }
 
     public Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, object resourse, IAuthorizationRequirement requirement) {
-        return service.AuthorizeAsync(user, resourse, requirement);
+        var res = service.AuthorizeAsync(user, resourse, requirement);
+        return res;
     }
 }
 }
