@@ -30,9 +30,12 @@
     <div>
         @if (User.Identity.IsAuthenticated)
         {
-            @if ((await AuthorizationService.AuthorizeAsync(
-               User, Model.Notification,
-               NotificatinOperations.Update)).Succeeded)
+            @if ((await AuthorizationService
+                        .AuthorizeAsync(
+                            User, 
+                            Model.Notification,
+                            NotificatinOperations.Update)
+                    ).Succeeded)
             {
                 <a asp-action="Edit" asp-route-id="@Model.Notification.Id">Edit</a>
             }

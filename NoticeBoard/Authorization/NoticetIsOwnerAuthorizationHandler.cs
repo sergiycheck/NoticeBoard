@@ -18,8 +18,8 @@ namespace NoticeBoard.Authorization
             _userManager = userManager;
         }
 
-        protected override Task
-            HandleRequirementAsync(AuthorizationHandlerContext context,
+        protected override Task HandleRequirementAsync(
+                                   AuthorizationHandlerContext context,
                                    OperationAuthorizationRequirement requirement,
                                    BaseModel resource)
         {
@@ -38,10 +38,9 @@ namespace NoticeBoard.Authorization
                 return Task.CompletedTask;
             }
 
-            if (resource.OwnerID == _userManager.GetUserId(context.User))//if user is owner of selected 
-            //contact OperationAuthorizationRequirement is Succed
+            if (resource.OwnerID == _userManager.GetUserId(context.User))//if user is owner of selected item
             {
-                context.Succeed(requirement);
+                context.Succeed(requirement);//contact OperationAuthorizationRequirement is Succed
             }
 
             return Task.CompletedTask;// Task result affects on future event handlers

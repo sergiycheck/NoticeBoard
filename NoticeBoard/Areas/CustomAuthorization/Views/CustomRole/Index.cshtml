@@ -1,0 +1,53 @@
+﻿@model NoticeBoard.Models.ViewModels.RoleControllerViewModels.IndexViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "all roles";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <a asp-controller="CustomRole" asp-action="Create">Add role</a>
+        <a asp-controller="CustomRole" asp-action="ListUsers">User list</a>
+
+        <div class="form-group" >
+            <p>@Model.deleteRoleViewModel.ResponceMessage</p>
+        </div>
+
+        <table class="table">
+            @foreach (var role in Model.customCustomRoleViewModels)
+            {
+                <tr>
+                    <td>@role.Name</td>
+
+                    <td>
+                        <form asp-controller="CustomRole" asp-action="DeleteRole" 
+                                 method="post">
+                                 @*asp-route-id="@role.Id"*@
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group" style="display:none;">
+                            <input asp-for="@Model.deleteRoleViewModel.RoleId" class="form-control" type="hidden" value="@role.Id" />
+                            <span asp-validation-for="@Model.deleteRoleViewModel.RoleId" class="text-danger" ></span>    
+                        </div>
+
+                        
+
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+            }
+        </table>
+    </div>
+
+
+
+</div>

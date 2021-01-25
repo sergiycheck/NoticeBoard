@@ -57,5 +57,9 @@ namespace NoticeBoard.AuthorizationsManagers
         {
             return base.IsSignedIn(principal);
         }
+        public override Task RefreshSignInAsync(CustomUser user)
+        {
+            return base.RefreshSignInAsync(user);
+        }
     }
 }

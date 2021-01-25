@@ -16,5 +16,6 @@ namespace NoticeBoard.Interfaces
         Task<SignInResult> PasswordSignInAsync(CustomUser user, string password, bool isPersistent, bool lockoutOnFailure);
         Task SignOutAsync();
         bool IsSignedIn(ClaimsPrincipal principal);
+        Task RefreshSignInAsync(CustomUser user);
     }
 }

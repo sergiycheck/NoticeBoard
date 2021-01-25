@@ -11,8 +11,13 @@ namespace NoticeBoard.Models
         public string Country{get;set;}
         public string City{get;set;}
         public string Address{get;set;}
-        //phoneNumberImplemented
-        //todo add city list
-        //add phone country list
+
+        //Implemented properties
+        //Id
+        //PhoneNumber
+        //Email
+        //UserName
     }
+    //todo add city list
+    //add phone country list
 }

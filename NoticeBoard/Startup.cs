@@ -12,16 +12,19 @@ using NoticeBoard.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-    using Microsoft.AspNetCore.Mvc.Authorization;
-    using Microsoft.AspNetCore.Authorization;
-    using NoticeBoard.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using NoticeBoard.Authorization;
 using NoticeBoard.Helpers;
 using Microsoft.AspNetCore.Http;
 using NoticeBoard.Interfaces;
 using NoticeBoard.Repositories;
 using NoticeBoard.AuthorizationsManagers;
 using NoticeBoard.Models;
-
+using NoticeBoard.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using NoticeBoard.Helpers.CustomMapper;
+using NoticeBoard.Helpers.CustomUserValidator;
 
 namespace NoticeBoard
 {
@@ -38,15 +41,27 @@ namespace NoticeBoard
         {
             services.AddDbContext<NoticeBoardDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("NoticeBoardDb")));
-            services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddRoles<IdentityRole>()//added roles
-                .AddEntityFrameworkStores<NoticeBoardDbContext>();
+                    Configuration.GetConnectionString("AzureNoticeBoardDb")));//NoticeBoardDb
+
+            services.AddDefaultIdentity<CustomUser>
+                (options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<CustomRole>()//added roles
+                .AddEntityFrameworkStores<NoticeBoardDbContext>()
+                .AddDefaultTokenProviders();
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();//https://stackoverflow.com/questions/58203748/is-live-reload-with-in-process-aspnet-core-3-possible
+
            services.AddRazorPages().AddRazorRuntimeCompilation();
+           
 
             services.AddTransient<ICommentsRepository,CommentsRepository>();
             services.AddTransient<INotificationsRepository,NotificationsRepository>();
+            services.AddTransient<IEmailSender, MyCustomEmailSender>();
+            services.AddTransient<ICustomMapper, CustomMapper>();
+
+            services.AddTransient<ICustomUserRepository, CustomUserRepository>();
+            services.AddTransient<Helpers.CustomUserValidator.IUserValidator<CustomUser>, CustomUserValidator>();
+
 
 
 
@@ -79,8 +94,8 @@ namespace NoticeBoard
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = false;
-                
+                options.User.RequireUniqueEmail = true;
+
                 //options.SignIn.RequireConfirmedAccount
             });
 
@@ -90,8 +105,8 @@ namespace NoticeBoard
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
-                options.LoginPath = new PathString("/CustomAccount/Login");//"/Identity/Account/Login";//change here
-                options.AccessDeniedPath = new PathString("/CustomAccount/AccessDenied");;//"/Identity/Account/AccessDenied";
+                options.LoginPath = new PathString("/Areas/CustomAuthorization/Views/CustomAccount/Login");//"/Identity/Account/Login";//change here
+                options.AccessDeniedPath = new PathString("/Areas/CustomAuthorization/Views/CustomAccount/AccessDenied");;//"/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
 
@@ -108,6 +123,8 @@ namespace NoticeBoard
 
             services.AddScoped<ICustomUserManager,CustomUserManager>();
             services.AddScoped<ICustomSignInManager,CustomSignInManager>();
+            services.AddScoped<ICustomRoleManager, CustomRoleManager>();
+            services.AddScoped<ICustomRolesRespository, CustomRolesRepository>();
 
 
         }
@@ -120,7 +137,7 @@ namespace NoticeBoard
                 await next();
                 if (context.Response.StatusCode == 404)
                 {
-                    context.Request.Path = "/CustomAccount/Error";
+                    context.Request.Path = "/Home/Error";
                     await next();
                 }
             });
@@ -128,15 +145,18 @@ namespace NoticeBoard
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                _ = app.UseDatabaseErrorPage();
             }
             else
             {
-                app.UseExceptionHandler("/CustomAccount/Error");
+                app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
+            //for js compilation
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -146,6 +166,11 @@ namespace NoticeBoard
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapAreaControllerRoute(
+                    name: "MyAreaCustomAuthorization",
+                    areaName: "CustomAuthorization",
+                    pattern: "CustomAuthorization/{controller=Home}/{action=Index}/{id?}");
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Notification}/{action=Index}/{id?}");

@@ -1,0 +1,33 @@
+﻿@model IEnumerable<NoticeBoard.Models.ViewModels.RoleControllerViewModels.CustomUserForRoleActionsViewModel>
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "users";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>
+
+        <table class="table">
+            @foreach(var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary"
+                            asp-controller="CustomRole"
+                            asp-action="EditUserRoles" 
+                            asp-route-userId="@user.Id">Access permissions</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+

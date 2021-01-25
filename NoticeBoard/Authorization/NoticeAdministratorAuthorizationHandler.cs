@@ -18,6 +18,7 @@ namespace NoticeBoard.Authorization
 
             if(context.User.IsInRole(NotificationConstants.ContactAdministratorsRole))
                 context.Succeed(requirement);
+
             return Task.CompletedTask;
         }
     }

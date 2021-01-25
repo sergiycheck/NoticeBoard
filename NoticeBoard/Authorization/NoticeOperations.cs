@@ -17,11 +17,11 @@ namespace NoticeBoard.Authorization
 
     public class NotificationConstants
     {
-        public static readonly string CreateOperationName = "Create";
-        public static readonly string ReadOperationName = "Read";
-        public static readonly string UpdateOperationName = "Update";
-        public static readonly string DeleteOperationName = "Delete";
-        public static readonly string ContactAdministratorsRole = 
+        public const  string CreateOperationName = "Create";
+        public const  string ReadOperationName = "Read";
+        public const  string UpdateOperationName = "Update";
+        public const  string DeleteOperationName = "Delete";
+        public const  string ContactAdministratorsRole = 
                                                               "NotificationAdministrators";
         //TODO:add more constants
     }

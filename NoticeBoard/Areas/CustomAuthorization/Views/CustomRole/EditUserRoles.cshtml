@@ -1,0 +1,51 @@
+﻿@model NoticeBoard.Models.ViewModels.ChangeRoleViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Change user roles";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div>
+            <a asp-action="ListUsers">Back to List</a>
+        </div>
+
+        <form  asp-area="CustomAuthorization" 
+                asp-controller="CustomRole" 
+                asp-action="EditUserRoles"
+                method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label"></label>
+                <input asp-for="UserId" class="form-control" />
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserEmail" class="control-label"></label>
+                <input asp-for="UserEmail" class="form-control" />
+                <span asp-validation-for="UserEmail" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                @foreach(var role in Model.AllRoles)
+                {
+                    <input type="checkbox"  
+                            value="@role" 
+                            name="UserRoles"
+                            @(Model.UserRoles.Contains(role) ? "checked=\"checked\"" : "")/>@role<br />
+                }
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+
+
+        </form>
+
+        </div>
+</div>

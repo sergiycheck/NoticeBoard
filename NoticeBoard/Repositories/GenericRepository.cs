@@ -19,6 +19,7 @@ namespace NoticeBoard.Repositories
         }
         public IQueryable<TEntity> GetAll()
         {
+            
             return _dbSet.AsNoTracking();
         }
         public async Task<TEntity> GetById(int? id)

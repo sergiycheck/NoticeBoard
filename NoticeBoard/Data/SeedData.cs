@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NoticeBoard.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using NoticeBoard.AuthorizationsManagers;
 
 namespace NoticeBoard.Data
 {
@@ -53,7 +54,7 @@ namespace NoticeBoard.Data
                                                                     string uid, string role)
         {
             IdentityResult IR = null;
-            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
+            var roleManager = serviceProvider.GetService<ICustomRoleManager>();
 
             if (roleManager == null)
             {
@@ -62,7 +63,7 @@ namespace NoticeBoard.Data
 
             if (!await roleManager.RoleExistsAsync(role))//ensure that current role doesn't exists and create it
             {
-                IR = await roleManager.CreateAsync(new IdentityRole(role));
+                IR = await roleManager.CreateAsync(new CustomRole(role));
             }
 
             var userManager = serviceProvider.GetService<ICustomUserManager>();
@@ -124,42 +125,44 @@ namespace NoticeBoard.Data
                 await context.SaveChangesAsync();
             }
             
-            
+            var notif0 = context.Notifications.AsNoTracking().ToArray()[0];
+            var notif1 = context.Notifications.AsNoTracking().ToArray()[1];
+            var notif2 = context.Notifications.AsNoTracking().ToArray()[2];
             var Comments = new Comment[]
             {
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).Id,
+                    NotificationId = notif0.Id,
                     OwnerID = adminID,
                     Description="Test comment for 0 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).Id,
+                    NotificationId = notif0.Id,
                     OwnerID = adminID,
                     Description="Test 1 comment for 0 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[0].Name).Id,
+                    NotificationId = notif0.Id,
                     OwnerID = adminID,
                     Description="Test 3 comment for 0 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[1].Name).Id,
+                    NotificationId = notif1.Id,
                     OwnerID = adminID,
                     Description="Test 1 comment for 1 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[1].Name).Id,
+                    NotificationId = notif1.Id,
                     OwnerID = adminID,
                     Description="Test 2 comment for 1 notification content"
                 },
                 new Comment()
                 {
-                    NotificationId = context.Notifications.AsNoTracking().Single(n=>n.Name==Notifications[2].Name).Id,
+                    NotificationId = notif2.Id,
                     OwnerID = adminID,
                     Description="Test 1 comment for 2 notification content"
                 }
