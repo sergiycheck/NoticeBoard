@@ -29,6 +29,7 @@ using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
 using NuGet.Frameworks;
 using NoticeBoard.Data;
+using NoticeBoard.Helpers.CustomMapper;
 
 
 //in directory NoticeBoard.XUnitTest execute following command to add reference to testing project
@@ -185,14 +186,18 @@ namespace NoticeBoard.XUnitTests
 
                     var mockUser = new Mock<ClaimsPrincipal>();
                     mockUser.SetupGet(user => user.Identity.IsAuthenticated).Returns(true);
-                    
+
+                    var mockMapper = new Mock<ICustomMapper>();
+                    mockMapper.Setup(mapper => mapper.Map_EditUserViewModel(It.IsAny<CustomUser>())).Returns(new EditUserViewModel());
+
 
 
                     var controller = new CustomAccountController(
                     mockCustomUserManager.Object,
                     mockCustomSignInManager.Object,
                     logger,
-                    mockEmailSender.Object);
+                    mockEmailSender.Object,
+                    mockMapper.Object);
                     
 
                     //Act

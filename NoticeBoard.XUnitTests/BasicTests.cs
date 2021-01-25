@@ -12,19 +12,37 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using System.Text.Encodings.Web;
 using System.Security.Claims;
+using Xunit.Abstractions;
+using NoticeBoard.Helpers;
+using NoticeBoard.Services;
+using NoticeBoard.Models.ViewModels;
+using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using NoticeBoard.XUnitTests.IntegrationTests;
+using Microsoft.Net.Http.Headers;
 
 namespace NoticeBoard.XUnitTests
 {
-    public class BasicTests : IClassFixture<WebApplicationFactory<Startup>>, IClassFixture<SqlServerControllerTests>
+    public class BasicTests : IClassFixture<WebApplicationFactory<Startup>>, 
+                              IClassFixture<SqlServerControllerTests>
     {
         private readonly WebApplicationFactory<Startup> _factory;
         public SqlServerControllerTests Fixture { get; }
 
-        public BasicTests(WebApplicationFactory<Startup> factory,
-            SqlServerControllerTests fixture)
+        private readonly ITestOutputHelper _output;
+
+        public BasicTests(
+            WebApplicationFactory<Startup> factory,
+            SqlServerControllerTests fixture,
+            ITestOutputHelper output
+            )
         {
             _factory = factory;
             Fixture = fixture;
+            _output = output;
         }
         [Theory]
         [InlineData("/")]
@@ -91,6 +109,7 @@ namespace NoticeBoard.XUnitTests
             //Assert
             Assert.Equal("/CustomAccount/Login", result.RequestMessage.RequestUri.AbsolutePath);
         }
+
         //[Fact]
         //public async Task GetEndpointsSuccessFromFormLogin()
         //{
@@ -198,6 +217,111 @@ namespace NoticeBoard.XUnitTests
             Assert.Equal(HttpStatusCode.Forbidden, responseNoOwnNotificationEdit.StatusCode);
             Assert.Equal(HttpStatusCode.Forbidden, responseNoOwnNotificationDelete.StatusCode);
         }
+
+        [Fact]
+        public async Task GetGetUserInfo() 
+        {
+            var infoRetriver = new InfoRetriever();
+            var info = await infoRetriver.GetInfo();
+            Assert.NotNull(info);
+            Assert.IsAssignableFrom<PersonalInfo>(info);
+            Assert.NotNull(info.Email);
+            Assert.NotNull(info.Password);
+            _output.WriteLine($"{info.Email} {info.Password}");
+
+        }
+        [Fact]
+        public async Task TestSendEmail() 
+        {
+            var receiverEmail = "kycok1@yahoo.com.ua";
+            var emailSender = new MyCustomEmailSender();
+            await emailSender.SendEmailAsync(receiverEmail, "test subject", "Test message"); 
+            //message received
+        }
+        [Fact]
+        public async Task Test_CustomAccountController_RegisterConfirmed() 
+        {
+            var uri = "/CustomAccount/Register";
+            
+            var client = _factory.CreateClient();
+            var registerGetResponse = await client.GetAsync(uri);
+            Assert.Equal(HttpStatusCode.OK, registerGetResponse.StatusCode);
+
+            //var values = registerGetresponse.Headers.GetValues("Set-Cookie").ToList();
+            //var requestVerificationToken = values.First().Substring(36, 155);
+
+            var antiForgeryValues = await AntiForgeryTokenExtractor.ExtractAntiForgeryValues(registerGetResponse);
+
+
+            _output.WriteLine($"requestVerificationToken \n {antiForgeryValues.cookieValue} " +
+                $"                                          \n{antiForgeryValues.fieldValue} ");
+
+            //var json = JsonConvert.SerializeObject(registerModel);
+
+            //var strContent = new StringContent(
+            //    json,
+            //    Encoding.UTF8, 
+            //    "application/x-www-form-urlencoded" /*"application/json"*/);
+
+
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+
+            request.Headers.Add("Cookie", 
+                            new CookieHeaderValue(AntiForgeryTokenExtractor.AntiForgeryCookieName, 
+                                                  antiForgeryValues.cookieValue)
+                            .ToString());
+
+
+            var registerModel = new RegisterInputModel()
+            {
+                UserName = "test1",
+                FirstName = "testFirstName",
+                LastName = "testLastName",
+                Country = "testCountry",
+                City = "testCity",
+                Address = "testAddress",
+                PhoneNumber = "12345",
+                Email = "kycok1@yahoo.com.ua",
+                Password = "1veWE3!vvv",
+                ConfirmPassword = "1veWE3!vvv"
+            };
+
+            var formContent = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string,string>("UserName",registerModel.UserName),
+                new KeyValuePair<string,string>("FirstName",registerModel.FirstName),
+                new KeyValuePair<string,string>("LastName",registerModel.LastName),
+                new KeyValuePair<string,string>("Country",registerModel.Country),
+                new KeyValuePair<string,string>("City",registerModel.City),
+                new KeyValuePair<string,string>("Address",registerModel.Address),
+                new KeyValuePair<string,string>("PhoneNumber",registerModel.PhoneNumber),
+                new KeyValuePair<string,string>("Email",registerModel.Email),
+                new KeyValuePair<string,string>("Password",registerModel.Password),
+                new KeyValuePair<string,string>("ConfirmPassword",registerModel.ConfirmPassword),
+                new KeyValuePair<string,string>(AntiForgeryTokenExtractor.AntiForgeryFieldName, antiForgeryValues.fieldValue),
+            });
+            request.Content = formContent;
+
+
+            //Act
+            var response = await client.SendAsync(request);
+
+            //Assert
+            var message = await response.Content.ReadAsStringAsync();
+            _output.WriteLine(message);
+
+            var statusCodes = new List<HttpStatusCode>() { HttpStatusCode.Redirect, HttpStatusCode.OK };
+            var contains = false;
+            if (statusCodes.Contains(response.StatusCode)) 
+            {
+                contains = true;
+            }
+            Assert.True(contains);
+            
+            
+        }
+
+
 
 
     }
