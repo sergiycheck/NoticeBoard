@@ -40,7 +40,18 @@ namespace NoticeBoard.Controllers
             return View(await _repository.GetAll().ToListAsync());
         }
 
+        //[HttpPost, ActionName("Index")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> IndexPost()
+        //{
+        //    _logger.LogInformation("method: Post. Notification controller index");
+
+
+
+        //}
+
         // GET: Notification/Details/5
+       
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {

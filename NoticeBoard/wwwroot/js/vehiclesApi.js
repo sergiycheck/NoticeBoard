@@ -2,7 +2,9 @@
 'use strict'
 
 //!!!always dont forget to change ngrok link
-const uri = 'https://localhost:5003/api/todoitems';//'https://34aa978a0475.ngrok.io/api/todoitems'//'https://localhost:5001/api/todoitems';
+const uri = 'https://localhost:5003/api/todoitems';
+//'https://34aa978a0475.ngrok.io/api/todoitems'
+//'https://localhost:5001/api/todoitems';
 
 let todos =[];
 

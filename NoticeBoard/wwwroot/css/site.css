@@ -69,5 +69,10 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
-
-/*comments css*/
+table > thead > tr > th > a:hover {
+    cursor: pointer;
+    font-size:1.1em;
+}
+.grow {
+    transition: all .2s ease-in-out;
+}

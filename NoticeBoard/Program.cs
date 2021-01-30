@@ -29,6 +29,7 @@ namespace NoticeBoard
                     var config = host.Services.GetRequiredService<IConfiguration>();
 
                     var adminPassword = config["seedUserPassword"];
+                    adminPassword ??= "!234Qwer";
 
                     SeedData.Initialize(services, adminPassword).Wait();
                 }
